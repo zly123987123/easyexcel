@@ -44,6 +44,10 @@ public class CellWriteHandlerContext {
      */
     private Row row;
     /**
+     * row index
+     */
+    private Integer rowIndex;
+    /**
      * cell
      */
     private Cell cell;

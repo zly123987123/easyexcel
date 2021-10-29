@@ -130,7 +130,9 @@ public class ExcelWriteAddExecutor extends AbstractExcelWriteExecutor {
         Map<Integer, Field> sortedAllFiledMap) {
         WriteHolder currentWriteHolder = writeContext.currentWriteHolder();
         BeanMap beanMap = BeanMapUtils.create(oneRowData);
-        Set<String> beanMapHandledSet = new HashSet<String>();
+        // Bean the contains of the Map Key method with poor performance,So to create a keySet here
+        Set<String> beanKeySet = new HashSet<>(beanMap.keySet());
+        Set<String> beanMapHandledSet = new HashSet<>();
         int maxCellIndex = -1;
         // If it's a class it needs to be cast by type
         if (HeadKindEnum.CLASS.equals(writeContext.currentWriteHolder().excelWriteHeadProperty().getHeadKind())) {
@@ -139,7 +141,7 @@ public class ExcelWriteAddExecutor extends AbstractExcelWriteExecutor {
                 int columnIndex = entry.getKey();
                 Head head = entry.getValue();
                 String name = head.getFieldName();
-                if (!beanMap.containsKey(name)) {
+                if (!beanKeySet.contains(name)) {
                     continue;
                 }
                 ExcelContentProperty excelContentProperty = ClassUtils.declaredExcelContentProperty(beanMap,
@@ -159,7 +161,7 @@ public class ExcelWriteAddExecutor extends AbstractExcelWriteExecutor {
             }
         }
         // Finish
-        if (beanMapHandledSet.size() == beanMap.size()) {
+        if (beanMapHandledSet.size() == beanKeySet.size()) {
             return;
         }
         maxCellIndex++;
@@ -169,7 +171,7 @@ public class ExcelWriteAddExecutor extends AbstractExcelWriteExecutor {
         for (Map.Entry<Integer, Field> entry : sortedAllFiledMap.entrySet()) {
             Field field = entry.getValue();
             String filedName = FieldUtils.resolveCglibFieldName(field);
-            boolean uselessData = !beanMap.containsKey(filedName) || beanMapHandledSet.contains(filedName)
+            boolean uselessData = !beanKeySet.contains(filedName) || beanMapHandledSet.contains(filedName)
                 || ignoreMap.containsKey(filedName);
             if (uselessData) {
                 continue;

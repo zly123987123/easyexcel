@@ -183,17 +183,19 @@ public class ExcelWriteFillExecutor extends AbstractExcelWriteExecutor {
         if (CollectionUtils.isEmpty(analysisCellList) || oneRowData == null) {
             return;
         }
-        Map<?, ?> dataMap;
+        Map dataMap;
         if (oneRowData instanceof Map) {
-            dataMap = (Map<?, ?>)oneRowData;
+            dataMap = (Map)oneRowData;
         } else {
             dataMap = BeanMapUtils.create(oneRowData);
         }
+        Set<String> dataKeySet = new HashSet<String>(dataMap.keySet());
+
         WriteSheetHolder writeSheetHolder = writeContext.writeSheetHolder();
         for (AnalysisCell analysisCell : analysisCellList) {
             if (analysisCell.getOnlyOneVariable()) {
                 String variable = analysisCell.getVariableList().get(0);
-                if (!dataMap.containsKey(variable)) {
+                if (!dataKeySet.contains(variable)) {
                     continue;
                 }
                 Object value = dataMap.get(variable);
@@ -223,7 +225,7 @@ public class ExcelWriteFillExecutor extends AbstractExcelWriteExecutor {
 
                 for (String variable : analysisCell.getVariableList()) {
                     cellValueBuild.append(analysisCell.getPrepareDataList().get(index++));
-                    if (!dataMap.containsKey(variable)) {
+                    if (!dataKeySet.contains(variable)) {
                         continue;
                     }
                     Object value = dataMap.get(variable);
